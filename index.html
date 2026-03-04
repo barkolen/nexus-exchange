@@ -282,13 +282,11 @@ h1 span {
   letter-spacing: 2px;
 }
 
-/* SVG Mugshot */
-.mugshot-svg {
+.mugshot-img {
   width: 100%;
-  max-width: 220px;
   display: block;
-  margin: 0 auto;
-  filter: sepia(0.3);
+  border-radius: 2px;
+  filter: sepia(0.15) contrast(1.05);
 }
 
 .mugshot-stats {
@@ -408,48 +406,7 @@ footer {
 <!-- MUGSHOT SECTION -->
 <div id="mugshot-section">
   <div class="mugshot-frame">
-    <!-- Simple SVG mugshot illustration -->
-    <svg class="mugshot-svg" viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
-      <!-- Background -->
-      <rect width="200" height="260" fill="#1a1008"/>
-      <!-- Height ruler lines -->
-      <line x1="10" y1="20" x2="10" y2="240" stroke="#2a1a0a" stroke-width="1"/>
-      <text x="14" y="60" fill="#2a1a0a" font-size="8" font-family="monospace">6'0"</text>
-      <text x="14" y="100" fill="#2a1a0a" font-size="8" font-family="monospace">5'8"</text>
-      <text x="14" y="140" fill="#2a1a0a" font-size="8" font-family="monospace">5'6"</text>
-      <!-- Body -->
-      <rect x="65" y="155" width="70" height="80" rx="4" fill="#2a2a3a"/>
-      <!-- Collar -->
-      <polygon points="85,155 100,175 115,155" fill="#e8dcc8"/>
-      <!-- Tie -->
-      <polygon points="95,155 105,155 102,185 100,190 98,185" fill="#8b1a1a"/>
-      <!-- Head -->
-      <ellipse cx="100" cy="120" rx="38" ry="42" fill="#c8956a"/>
-      <!-- Hair -->
-      <ellipse cx="100" cy="85" rx="40" ry="22" fill="#2a1a0a"/>
-      <rect x="62" y="85" width="76" height="15" fill="#2a1a0a"/>
-      <!-- Eyes -->
-      <ellipse cx="86" cy="118" rx="6" ry="5" fill="#1a0d05"/>
-      <ellipse cx="114" cy="118" rx="6" ry="5" fill="#1a0d05"/>
-      <ellipse cx="84" cy="116" rx="2" ry="2" fill="#3a2a1a"/>
-      <ellipse cx="112" cy="116" rx="2" ry="2" fill="#3a2a1a"/>
-      <!-- Nose -->
-      <ellipse cx="100" cy="128" rx="4" ry="3" fill="#b07850"/>
-      <!-- Mouth — tight, no smile -->
-      <line x1="90" y1="140" x2="110" y2="140" stroke="#6a3a2a" stroke-width="2" stroke-linecap="round"/>
-      <!-- Ear left -->
-      <ellipse cx="62" cy="120" rx="6" ry="9" fill="#c8956a"/>
-      <!-- Ear right -->
-      <ellipse cx="138" cy="120" rx="6" ry="9" fill="#c8956a"/>
-      <!-- Suit lapels -->
-      <polygon points="65,155 85,155 75,200 55,200" fill="#222230"/>
-      <polygon points="115,155 135,155 145,200 125,200" fill="#222230"/>
-      <!-- Number plate -->
-      <rect x="55" y="215" width="90" height="20" fill="#0d0a07" rx="2"/>
-      <text x="100" y="229" fill="#c8860a" font-size="10" font-family="monospace" text-anchor="middle" letter-spacing="2">VM-7741</text>
-      <!-- Sepia overlay -->
-      <rect width="200" height="260" fill="rgba(139,90,20,0.08)"/>
-    </svg>
+    <img src="/viktor_mugshot.png" class="mugshot-img" alt="Viktor Marlowe — Case #7741"/>
 
     <div class="mugshot-stats">
       NAME: <span>Viktor Marlowe</span><br>
