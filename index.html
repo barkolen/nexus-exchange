@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS EXCHANGE — Member Portal</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+  --green: #00ff41;
+  --dim-green: #00aa2a;
+  --dark-green: #003010;
+  --bg: #030a04;
+  --panel: #050f06;
+  --border: #0a2a0c;
+  --red: #ff2233;
+  --amber: #ffaa00;
+  --dim: #1a3a1c;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--green);
+  font-family: 'Courier Prime', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* CRT scanlines */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.15) 2px,
+    rgba(0,0,0,0.15) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Screen flicker */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0,255,65,0.015);
+  animation: flicker 8s infinite;
+  pointer-events: none;
+  z-index: 9998;
+}
+@keyframes flicker {
+  0%,100%{opacity:1} 92%{opacity:1} 93%{opacity:0.7} 94%{opacity:1} 96%{opacity:0.85} 97%{opacity:1}
+}
+
+/* TERMINAL HEADER */
+#terminal-bar {
+  background: #000;
+  border-bottom: 1px solid var(--dim-green);
+  padding: 6px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  letter-spacing: 2px;
+  color: var(--dim-green);
+}
+.blink { animation: blink 1s step-end infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* MAIN LAYOUT */
+#layout {
+  display: grid;
+  grid-template-columns: 220px 1fr 200px;
+  gap: 0;
+  min-height: calc(100vh - 36px);
+}
+
+/* SIDEBAR */
+#sidebar {
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+  background: var(--panel);
+}
+.nav-header {
+  font-family: 'VT323', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--dim);
+  padding: 0 16px 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+.nav-item {
+  padding: 7px 16px;
+  font-size: 13px;
+  color: var(--dim-green);
+  cursor: pointer;
+  transition: all 0.1s;
+  border-left: 2px solid transparent;
+  letter-spacing: 1px;
+}
+.nav-item:hover { color: var(--green); border-left-color: var(--green); background: rgba(0,255,65,0.03); }
+.nav-item.active { color: var(--green); border-left-color: var(--green); background: rgba(0,255,65,0.05); }
+.nav-sep { height: 1px; background: var(--border); margin: 10px 0; }
+
+/* MAIN CONTENT */
+#main {
+  padding: 24px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+/* RIGHT PANEL */
+#right-panel {
+  padding: 16px;
+  background: var(--panel);
+}
+
+/* SECTION HEADERS */
+.section-title {
+  font-family: 'VT323', monospace;
+  font-size: 22px;
+  letter-spacing: 4px;
+  color: var(--green);
+  text-shadow: 0 0 10px rgba(0,255,65,0.4);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ALERT BOX */
+.alert {
+  border: 1px solid var(--red);
+  padding: 10px 14px;
+  margin-bottom: 20px;
+  font-size: 12px;
+  color: var(--red);
+  background: rgba(255,34,51,0.05);
+  letter-spacing: 1px;
+  animation: alert-pulse 3s ease-in-out infinite;
+}
+@keyframes alert-pulse { 0%,100%{border-color:var(--red)} 50%{border-color:rgba(255,34,51,0.3)} }
+
+/* PANELS */
+.panel {
+  border: 1px solid var(--border);
+  background: rgba(0,255,65,0.02);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.panel-head {
+  background: rgba(0,255,65,0.04);
+  border-bottom: 1px solid var(--border);
+  padding: 7px 14px;
+  font-family: 'VT323', monospace;
+  font-size: 15px;
+  letter-spacing: 3px;
+  color: var(--dim-green);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.panel-body { padding: 14px; }
+
+/* TABLE */
+.data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.data-table th { color: var(--dim-green); text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); font-weight: normal; letter-spacing: 2px; font-size: 11px; }
+.data-table td { padding: 8px 10px; border-bottom: 1px solid rgba(0,255,65,0.05); color: var(--green); font-size: 12px; vertical-align: top; }
+.data-table tr:hover td { background: rgba(0,255,65,0.03); }
+
+.hash { color: var(--dim-green); font-size: 11px; }
+.amount-in { color: #00ff41; }
+.amount-out { color: var(--red); }
+.tag { display: inline-block; padding: 1px 6px; font-size: 10px; letter-spacing: 1px; border: 1px solid; }
+.tag-warn { color: var(--amber); border-color: var(--amber); background: rgba(255,170,0,0.05); }
+.tag-flag { color: var(--red); border-color: var(--red); background: rgba(255,34,51,0.05); }
+.tag-ok { color: var(--dim-green); border-color: var(--dim-green); }
+
+/* PROFILE CARD */
+.profile-card {
+  border: 1px solid var(--border);
+  padding: 16px;
+  margin-bottom: 14px;
+  background: rgba(0,255,65,0.02);
+  position: relative;
+  overflow: hidden;
+}
+.profile-card::before {
+  content: 'FLAGGED';
+  position: absolute;
+  top: 8px; right: -20px;
+  background: var(--red);
+  color: #000;
+  font-family: 'VT323', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 2px 30px;
+  transform: rotate(15deg);
+}
+.profile-name { font-family: 'VT323', monospace; font-size: 28px; color: var(--green); letter-spacing: 3px; margin-bottom: 4px; }
+.profile-alias { font-size: 12px; color: var(--amber); letter-spacing: 2px; margin-bottom: 10px; }
+.profile-field { font-size: 12px; margin-bottom: 5px; color: var(--dim-green); }
+.profile-field span { color: var(--green); }
+
+/* CHAT LOG */
+.chat-entry { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+.chat-entry:last-child { border-bottom: none; }
+.chat-meta { font-size: 10px; color: var(--dim); letter-spacing: 2px; margin-bottom: 5px; }
+.chat-sender { color: var(--amber); }
+.chat-text { font-size: 13px; line-height: 1.7; color: var(--green); }
+.chat-text .redacted { background: var(--dim-green); color: var(--dim-green); cursor: pointer; transition: all 0.2s; padding: 0 3px; }
+.chat-text .redacted:hover { background: transparent; color: var(--red); }
+
+/* WALLET ADDRESS */
+.wallet-address {
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  letter-spacing: 2px;
+  color: var(--green);
+  text-shadow: 0 0 8px rgba(0,255,65,0.3);
+  word-break: break-all;
+  background: rgba(0,255,65,0.03);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  margin: 8px 0;
+}
+
+/* RIGHT PANEL WIDGETS */
+.widget { margin-bottom: 16px; }
+.widget-title { font-family: 'VT323', monospace; font-size: 13px; letter-spacing: 2px; color: var(--dim-green); margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+.stat-row { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; color: var(--dim-green); }
+.stat-row span { color: var(--green); }
+.stat-row.highlight span { color: var(--red); }
+
+/* NOTICE */
+.notice {
+  font-size: 11px;
+  color: var(--dim);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  margin-top: 10px;
+  letter-spacing: 1px;
+  line-height: 1.6;
+}
+
+/* HIDDEN clue — only visible on hover of a specific element */
+.hidden-clue {
+  color: var(--bg);
+  background: var(--bg);
+  font-size: 10px;
+  letter-spacing: 1px;
+  transition: all 0.3s;
+  cursor: text;
+  padding: 2px;
+  user-select: all;
+}
+.hidden-clue:hover { color: var(--red); background: rgba(255,34,51,0.1); }
+
+/* PAGE visibility */
+.page { display: none; }
+.page.active { display: block; }
+
+/* GLITCH text effect */
+@keyframes glitch {
+  0%,100%{clip-path:inset(0 0 98% 0);transform:translate(-2px)} 
+  20%{clip-path:inset(30% 0 50% 0);transform:translate(2px)}
+  40%{clip-path:inset(70% 0 10% 0);transform:translate(-1px)}
+  60%{clip-path:inset(10% 0 80% 0);transform:translate(1px)}
+}
+</style>
+</head>
+<body>
+
+<!-- TERMINAL BAR -->
+<div id="terminal-bar">
+  <span>NEXUS_EXCHANGE v2.7 // MEMBER PORTAL // TOR ROUTING ACTIVE</span>
+  <span>IP: 185.220.101.<span id="ip-end">???</span> &nbsp;|&nbsp; SESSION: <span id="session-id">???</span> &nbsp;|&nbsp; <span class="blink">■</span> LIVE</span>
+</div>
+
+<!-- LAYOUT -->
+<div id="layout">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="nav-header">NAVIGATION</div>
+    <div class="nav-item active" onclick="showPage('dashboard')">▸ DASHBOARD</div>
+    <div class="nav-item" onclick="showPage('profile')">▸ USER PROFILE</div>
+    <div class="nav-item" onclick="showPage('transactions')">▸ TRANSACTIONS</div>
+    <div class="nav-item" onclick="showPage('messages')">▸ MESSAGES</div>
+    <div class="nav-sep"></div>
+    <div class="nav-header">SYSTEM</div>
+    <div class="nav-item" onclick="showPage('logs')">▸ ACCESS LOGS</div>
+    <div class="nav-item" style="color:#3a1a1a">▸ [ENCRYPTED]</div>
+    <div class="nav-item" style="color:#3a1a1a">▸ [ENCRYPTED]</div>
+    <div class="nav-sep"></div>
+    <div class="notice">
+      ⚠ THIS PORTAL HAS BEEN SEIZED<br>AS PART OF OPERATION COLDCHAIN<br><br>
+      All records preserved<br>for law enforcement use.
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main">
+
+    <!-- DASHBOARD PAGE -->
+    <div class="page active" id="page-dashboard">
+      <div class="section-title">◈ DASHBOARD</div>
+
+      <div class="alert">
+        ⚠ ALERT: THIS ACCOUNT HAS BEEN FLAGGED FOR INVESTIGATION — CASE REF: PD-7741 — ALL ACTIVITY LOGGED
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <span>ACCOUNT OVERVIEW</span>
+          <span style="font-size:11px;color:var(--red)">STATUS: FROZEN</span>
+        </div>
+        <div class="panel-body">
+          <div class="profile-field">USERNAME: <span>v_marlowe_88</span></div>
+          <div class="profile-field">MEMBER SINCE: <span>2019-03-14</span></div>
+          <div class="profile-field">ACCOUNT TIER: <span style="color:var(--amber)">PLATINUM</span></div>
+          <div class="profile-field">LAST LOGIN: <span>2024-01-09 03:47:22 UTC</span></div>
+          <div class="profile-field">TOTAL VOLUME: <span>₿ 14.7741</span></div>
+          <div class="profile-field" style="margin-top:12px">PRIMARY WALLET ADDRESS:</div>
+          <div class="wallet-address">1ViKtorM4rL0weXXBTC7741xxxxxxxxxxxxxxxxx</div>
+          <div style="font-size:10px;color:var(--dim);margin-top:4px">⚠ Wallet flagged — outgoing transfers blocked by court order</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><span>RECENT ACTIVITY SUMMARY</span></div>
+        <div class="panel-body">
+          <table class="data-table">
+            <tr><th>DATE</th><th>TYPE</th><th>AMOUNT</th><th>STATUS</th></tr>
+            <tr><td>2024-01-09</td><td>WITHDRAWAL</td><td class="amount-out">-₿ 2.4400</td><td><span class="tag tag-flag">BLOCKED</span></td></tr>
+            <tr><td>2024-01-08</td><td>TRANSFER IN</td><td class="amount-in">+₿ 2.4400</td><td><span class="tag tag-warn">FLAGGED</span></td></tr>
+            <tr><td>2024-01-07</td><td>WITHDRAWAL</td><td class="amount-out">-₿ 0.9900</td><td><span class="tag tag-ok">COMPLETED</span></td></tr>
+            <tr><td>2023-12-31</td><td>TRANSFER IN</td><td class="amount-in">+₿ 5.1100</td><td><span class="tag tag-warn">FLAGGED</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div class="page" id="page-profile">
+      <div class="section-title">◈ USER PROFILE</div>
+
+      <div class="profile-card">
+        <div class="profile-name">VIKTOR MARLOWE</div>
+        <div class="profile-alias">alias: V.M. / "Viktor88" / "the_marlowe"</div>
+        <div class="profile-field">DATE OF BIRTH: <span>1988-07-14</span></div>
+        <div class="profile-field">NATIONALITY: <span>UKRAINIAN / UK RESIDENT</span></div>
+        <div class="profile-field">REGISTERED EMAIL: <span>v.marlowe@protonmail.com</span></div>
+        <div class="profile-field">PHONE (unverified): <span>+44 7700 9xx xxx</span></div>
+        <div class="profile-field">KYC STATUS: <span style="color:var(--red)">BYPASSED — FAKE ID DETECTED</span></div>
+        <div class="profile-field">LINKED ACCOUNTS: <span style="color:var(--amber)">3 DETECTED (2 ANONYMOUS)</span></div>
+        <div style="margin-top:12px">
+          <div class="profile-field">KNOWN ASSOCIATES:</div>
+          <div style="font-size:12px;color:var(--dim-green);padding:8px;border:1px solid var(--border);margin-top:4px;line-height:1.8">
+            — "GHOST_NODE" (identity unknown)<br>
+            — "K4RL4" (linked to 2 prior fraud cases)<br>
+            — <span style="color:var(--amber)">THIRD CONTACT: </span><span class="hidden-clue" title="hover to reveal">REDACTED_INFORMANT_HANDLE_7</span>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <div class="profile-field">INVESTIGATOR NOTES:</div>
+          <div style="font-size:12px;color:var(--dim-green);padding:8px;border:1px solid var(--red);margin-top:4px;line-height:1.8;background:rgba(255,34,51,0.03)">
+            Subject refuses to disclose private key for wallet 1ViKtor... Claims key was "lost."
+            Forensic analysis suggests key stored in memorized format — 51-character WIF encoding.
+            Key begins with <span style="color:var(--red);font-weight:bold">5K</span> — consistent with uncompressed mainnet private key.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS PAGE -->
+    <div class="page" id="page-transactions">
+      <div class="section-title">◈ TRANSACTION HISTORY</div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <span>BLOCKCHAIN RECORDS — WALLET: 1ViKtorM4rL0we...</span>
+          <span style="font-size:10px;color:var(--amber)">14 TRANSACTIONS FLAGGED</span>
+        </div>
+        <div class="panel-body">
+          <table class="data-table">
+            <tr><th>TXID</th><th>DATE</th><th>FROM / TO</th><th>AMOUNT</th><th>FLAG</th></tr>
+            <tr>
+              <td class="hash">a7f3c9...8e21</td>
+              <td>2024-01-08</td>
+              <td style="font-size:11px">FROM: bc1q9v2...theft_origin</td>
+              <td class="amount-in">+₿ 2.44</td>
+              <td><span class="tag tag-flag">STOLEN FUNDS</span></td>
+            </tr>
+            <tr>
+              <td class="hash">b2e8a1...cc40</td>
+              <td>2024-01-07</td>
+              <td style="font-size:11px">TO: mixer_svc_7</td>
+              <td class="amount-out">-₿ 0.99</td>
+              <td><span class="tag tag-warn">MIXER</span></td>
+            </tr>
+            <tr>
+              <td class="hash">f9d0e7...1130</td>
+              <td>2023-12-31</td>
+              <td style="font-size:11px">FROM: exchange_cold_7741</td>
+              <td class="amount-in">+₿ 5.11</td>
+              <td><span class="tag tag-flag">ORIGIN UNKNOWN</span></td>
+            </tr>
+            <tr>
+              <td class="hash">0c4b22...7792</td>
+              <td>2023-12-28</td>
+              <td style="font-size:11px">TO: V.M. personal wallet</td>
+              <td class="amount-out">-₿ 1.20</td>
+              <td><span class="tag tag-ok">CONFIRMED</span></td>
+            </tr>
+          </table>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+            <div class="profile-field">TOTAL SUSPICIOUS INFLOW: <span style="color:var(--red)">₿ 14.77</span></div>
+            <div class="profile-field">SOURCE WALLET (THEFT ORIGIN): <span style="color:var(--red);word-break:break-all">bc1q9v2skp5z4mua7xqhxkn0lmr7d8ckefgp7741x</span></div>
+            <div style="font-size:10px;color:var(--dim);margin-top:6px">Cross-referenced with reported theft case #PD-7741. Match probability: 99.7%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGES PAGE -->
+    <div class="page" id="page-messages">
+      <div class="section-title">◈ RECOVERED MESSAGES</div>
+      <div class="alert">PARTIAL DECRYPTION — 3 OF 7 THREADS RECOVERED</div>
+
+      <div class="panel">
+        <div class="panel-head"><span>THREAD: V.M. ↔ GHOST_NODE</span><span style="color:var(--amber);font-size:10px">DECRYPTED</span></div>
+        <div class="panel-body">
+          <div class="chat-entry">
+            <div class="chat-meta"><span class="chat-sender">GHOST_NODE</span> — 2024-01-06 22:14 UTC</div>
+            <div class="chat-text">package confirmed. did you move the funds yet?</div>
+          </div>
+          <div class="chat-entry">
+            <div class="chat-meta"><span class="chat-sender">v_marlowe_88</span> — 2024-01-06 22:31 UTC</div>
+            <div class="chat-text">not yet. keeping it cold for now. they're watching the chain. i wrote the key down. won't touch it until things cool off</div>
+          </div>
+          <div class="chat-entry">
+            <div class="chat-meta"><span class="chat-sender">GHOST_NODE</span> — 2024-01-06 22:33 UTC</div>
+            <div class="chat-text">smart. how long?</div>
+          </div>
+          <div class="chat-entry">
+            <div class="chat-meta"><span class="chat-sender">v_marlowe_88</span> — 2024-01-06 22:35 UTC</div>
+            <div class="chat-text">3 months minimum. the key is memorised. starts with <span style="color:var(--amber);font-weight:bold">5KJvsng</span> — you know the rest of the format. standard WIF. 51 chars.</div>
+          </div>
+          <div class="chat-entry">
+            <div class="chat-meta"><span class="chat-sender">GHOST_NODE</span> — 2024-01-06 22:36 UTC</div>
+            <div class="chat-text">good. don't write it anywhere. don't say it out loud. <span class="redacted" title="click to reveal">████████████████████</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><span>THREAD: V.M. ↔ K4RL4</span><span style="color:var(--red);font-size:10px">PARTIAL DECRYPT</span></div>
+        <div class="panel-body">
+          <div class="chat-entry">
+            <div class="chat-meta"><span class="chat-sender">K4RL4</span> — 2024-01-08 11:02 UTC</div>
+            <div class="chat-text">police are asking around. someone talked. you need to disappear the wallet</div>
+          </div>
+          <div class="chat-entry">
+            <div class="chat-meta"><span class="chat-sender">v_marlowe_88</span> — 2024-01-08 11:19 UTC</div>
+            <div class="chat-text">i know. they picked me up this morning. i'm not saying <span class="redacted" title="click to reveal">████ ██████ ███</span>. they have nothing without the key. and i'm the only one who has it.</div>
+          </div>
+          <div class="chat-entry">
+            <div class="chat-meta"><span class="chat-sender">K4RL4</span> — 2024-01-08 11:20 UTC</div>
+            <div class="chat-text">hold firm. they can't prove anything without it. stay quiet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCESS LOGS PAGE -->
+    <div class="page" id="page-logs">
+      <div class="section-title">◈ ACCESS LOGS</div>
+      <div class="panel">
+        <div class="panel-head"><span>LOGIN HISTORY — v_marlowe_88</span></div>
+        <div class="panel-body">
+          <table class="data-table">
+            <tr><th>TIMESTAMP (UTC)</th><th>IP ADDRESS</th><th>LOCATION</th><th>ACTION</th></tr>
+            <tr><td>2024-01-09 03:47</td><td>185.220.101.47</td><td>TOR EXIT NODE</td><td>LOGIN</td></tr>
+            <tr><td>2024-01-08 11:19</td><td>185.220.101.33</td><td>TOR EXIT NODE</td><td>MSG SENT</td></tr>
+            <tr><td>2024-01-08 09:02</td><td>92.41.77.14</td><td style="color:var(--red)">LONDON, UK ⚠</td><td>LOGIN — IP LEAK</td></tr>
+            <tr><td>2024-01-07 21:55</td><td>185.220.101.88</td><td>TOR EXIT NODE</td><td>WITHDRAWAL</td></tr>
+            <tr><td>2024-01-06 22:14</td><td>185.220.101.47</td><td>TOR EXIT NODE</td><td>MSG SENT</td></tr>
+          </table>
+          <div style="margin-top:14px;padding:10px;border:1px solid var(--red);background:rgba(255,34,51,0.04);font-size:12px;color:var(--red)">
+            ⚠ INVESTIGATOR FLAG: Session on 2024-01-08 09:02 — TOR misconfiguration exposed real IP: 92.41.77.14<br>
+            Geo-located to: <strong>SHOREDITCH, LONDON E1</strong> — cross-referenced with suspect's known residence.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+
+  <!-- RIGHT PANEL -->
+  <div id="right-panel">
+    <div class="widget">
+      <div class="widget-title">CASE REFERENCE</div>
+      <div class="stat-row">REF: <span>PD-7741</span></div>
+      <div class="stat-row">SUBJECT: <span>V. MARLOWE</span></div>
+      <div class="stat-row highlight">STATUS: <span>IN CUSTODY</span></div>
+      <div class="stat-row">WALLET: <span style="font-size:10px">1ViKtorM4rL0we...</span></div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-title">KEY INTEL</div>
+      <div style="font-size:11px;color:var(--dim-green);line-height:1.8">
+        • Private key: WIF format<br>
+        • Length: <span style="color:var(--green)">51 characters</span><br>
+        • Starts with: <span style="color:var(--amber)">5K</span><br>
+        • Memorised by subject<br>
+        • Not written anywhere<br>
+        • <span style="color:var(--red)">NOT YET RECOVERED</span>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-title">WALLET BALANCE</div>
+      <div style="font-family:'VT323',monospace;font-size:28px;color:var(--green);text-shadow:0 0 10px rgba(0,255,65,0.4);letter-spacing:2px">₿ 2.4400</div>
+      <div style="font-size:10px;color:var(--dim);margin-top:4px">≈ $104,920 USD</div>
+      <div style="font-size:10px;color:var(--red);margin-top:6px">FROZEN — PENDING KEY RECOVERY</div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-title">EVIDENCE CHECKLIST</div>
+      <div style="font-size:11px;color:var(--dim-green);line-height:2">
+        <span style="color:var(--green)">✓</span> Wallet address ID'd<br>
+        <span style="color:var(--green)">✓</span> Transactions flagged<br>
+        <span style="color:var(--green)">✓</span> IP address exposed<br>
+        <span style="color:var(--green)">✓</span> Messages recovered<br>
+        <span style="color:var(--red)">✗</span> Private key — <strong>MISSING</strong>
+      </div>
+    </div>
+
+    <div class="notice">
+      SCREENSHOT ANY PAGE<br>
+      AND PRESENT AS EVIDENCE<br>
+      IN THE INTERROGATION.<br><br>
+      VIKTOR WILL REACT TO<br>
+      WHAT YOU FOUND.
+    </div>
+  </div>
+
+</div><!-- /layout -->
+
+<script>
+// Random session data
+document.getElementById('ip-end').textContent = Math.floor(Math.random()*254)+1;
+document.getElementById('session-id').textContent = Math.random().toString(36).substr(2,8).toUpperCase();
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
