@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE INTERROGATION</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Share+Tech+Mono&family=Oswald:wght@300;400;600&display=swap');
+:root{--cream:#e8dcc8;--dark:#0d0a07;--amber:#c8860a;--red:#8b1a1a;--green:#1a4a2a;--light:#f5efe0;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--dark);color:var(--cream);font-family:'Share Tech Mono',monospace;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+#header{background:#0a0805;border-bottom:2px solid #1a0d05;padding:6px 14px;display:flex;justify-content:space-between;align-items:center;}
+#title{font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;letter-spacing:6px;color:var(--amber);}
+#case-info{font-size:9px;color:#2a1a0a;letter-spacing:2px;text-align:right;}
+#status-bar{background:#0a0805;border-bottom:1px solid #1a0d05;padding:4px 14px;display:flex;align-items:center;gap:10px;font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:2px;color:#3a2a1a;}
+#pressure-bar-wrap{flex:1;height:4px;background:#1a1005;border-radius:2px;overflow:hidden;}
+#pressure-fill{height:100%;width:0%;background:linear-gradient(90deg,#1a4a2a,#c8860a,#8b1a1a);transition:width 0.5s;border-radius:2px;}
+#room{flex:1;position:relative;overflow:hidden;background:linear-gradient(180deg,#1a1008 0%,#2a1a0a 40%,#1a0d05 100%);display:flex;align-items:center;justify-content:center;}
+.ceiling-light{position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:40px;height:30px;background:#fff8e0;border-radius:3px;box-shadow:0 0 80px 60px rgba(255,240,150,0.1),0 0 200px 120px rgba(255,220,80,0.05);z-index:1;}
+.wall-l{position:absolute;top:0;bottom:0;left:0;width:28%;background:linear-gradient(90deg,#0a0805,#161008);border-right:2px solid #1a1005;}
+.wall-r{position:absolute;top:0;bottom:0;right:0;width:28%;background:linear-gradient(270deg,#0a0805,#161008);border-left:2px solid #1a1005;}
+.floor{position:absolute;bottom:0;left:0;right:0;height:32%;background:linear-gradient(180deg,#180c04,#0d0805);border-top:3px solid #2a1500;}
+.mirror{position:absolute;top:8%;right:4%;width:13%;height:25%;background:linear-gradient(135deg,rgba(100,150,200,0.1),rgba(50,80,120,0.03));border:2px solid #3a2a1a;z-index:2;}
+.mirror-label{position:absolute;bottom:4px;right:4px;font-size:7px;color:rgba(200,180,100,0.2);letter-spacing:2px;font-family:'Oswald',sans-serif;}
+.door{position:absolute;bottom:32%;left:4%;width:8%;height:36%;background:linear-gradient(180deg,#261508,#160a03);border:2px solid #3a2a1a;z-index:2;}
+.doorknob{position:absolute;right:15%;top:50%;width:7px;height:7px;background:#c8860a;border-radius:50%;}
+.table{position:absolute;bottom:26%;left:50%;transform:translateX(-50%);width:52%;height:10px;background:linear-gradient(180deg,#5a3a1a,#3a2010);border-radius:3px;box-shadow:0 8px 30px rgba(0,0,0,0.6),0 2px 0 #7a5a2a;z-index:3;}
+.folder{position:absolute;bottom:33%;left:42%;width:70px;height:48px;background:#c8a050;transform:rotate(-2deg);z-index:4;border-radius:2px;box-shadow:2px 2px 8px rgba(0,0,0,0.5);padding:6px;font-size:7px;color:#5a3a10;font-family:'Special Elite',cursive;letter-spacing:1px;}
+.cup-wrap{position:absolute;bottom:33%;right:24%;z-index:4;}
+.cup-steam{font-size:9px;color:rgba(200,180,150,0.35);margin-left:4px;animation:steam 2s ease-in-out infinite;}
+@keyframes steam{0%,100%{opacity:0.2;transform:translateY(0)}50%{opacity:0.6;transform:translateY(-3px)}}
+.cup{width:18px;height:18px;background:linear-gradient(180deg,#3a2a1a,#1a0d05);border-radius:2px 2px 4px 4px;border:2px solid #4a3a2a;}
+.saucer{width:26px;height:4px;background:#3a2a1a;border-radius:3px;margin-left:-4px;}
+#suspect{position:absolute;bottom:34%;left:50%;transform:translateX(-50%);z-index:5;}
+.s-head{position:relative;width:44px;height:48px;background:#c8956a;border-radius:50% 50% 40% 40%;margin:0 auto;box-shadow:inset -4px -4px 12px rgba(0,0,0,0.3);transition:background 1s;}
+.s-hair{position:absolute;top:-4px;left:-2px;right:-2px;height:22px;background:#2a1a0a;border-radius:50% 50% 0 0;}
+.s-eye-l{position:absolute;top:20px;left:7px;width:7px;height:5px;background:#1a0d05;border-radius:50%;}
+.s-eye-r{position:absolute;top:20px;right:7px;width:7px;height:5px;background:#1a0d05;border-radius:50%;}
+.s-mouth{position:absolute;bottom:9px;left:50%;transform:translateX(-50%);width:12px;height:3px;background:#6a4a3a;border-radius:2px;transition:all 0.5s;}
+.s-sweat{position:absolute;top:14px;right:-7px;width:5px;height:7px;background:rgba(150,200,255,0.5);border-radius:50% 50% 50% 50%/30% 30% 70% 70%;animation:sweat 3s infinite;opacity:0;}
+@keyframes sweat{0%{opacity:0;transform:translateY(0)}20%{opacity:0.8}100%{opacity:0;transform:translateY(16px)}}
+@keyframes shake{0%,100%{transform:translateX(-50%)}25%{transform:translateX(calc(-50% - 2px)) rotate(-0.5deg)}75%{transform:translateX(calc(-50% + 2px)) rotate(0.5deg)}}
+.s-body{width:58px;height:52px;background:#2a2a3a;border-radius:5px 5px 0 0;margin:0 auto;position:relative;transition:background 1s;}
+.s-collar{position:absolute;top:0;left:50%;transform:translateX(-50%);width:22px;height:11px;background:#e8dcc8;clip-path:polygon(0 0,50% 100%,100% 0);}
+.s-tie{position:absolute;top:4px;left:50%;transform:translateX(-50%);width:11px;height:28px;background:#8b1a1a;clip-path:polygon(30% 0%,70% 0%,100% 40%,50% 100%,0% 40%);}
+#bubble{position:absolute;bottom:calc(34% + 115px);left:50%;transform:translateX(-50%);max-width:340px;min-width:160px;background:var(--light);color:var(--dark);padding:11px 15px;border-radius:10px;font-family:'Special Elite',cursive;font-size:13px;line-height:1.6;box-shadow:3px 3px 15px rgba(0,0,0,0.5);z-index:10;text-align:center;display:none;}
+#bubble.show{display:block;}
+#bubble::after{content:'';position:absolute;bottom:-11px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:11px solid var(--light);}
+.dots span{animation:blink 1.2s infinite;font-size:18px;color:#3a2a1a;}
+.dots span:nth-child(2){animation-delay:0.2s}.dots span:nth-child(3){animation-delay:0.4s}
+@keyframes blink{0%,80%,100%{opacity:0.2}40%{opacity:1}}
+#bottom{background:#0a0805;border-top:2px solid #1a0d05;padding:8px 14px;}
+#evidence-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+#upload-btn{background:#0d1a0d;border:1px solid #1a4a2a;color:#4aaa4a;padding:5px 12px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;cursor:pointer;border-radius:2px;white-space:nowrap;}
+#upload-btn:disabled{color:#1a3a1a;border-color:#0a1a0a;cursor:not-allowed;}
+#upload-msg{font-size:10px;letter-spacing:1px;flex:1;}
+#tactics{display:flex;gap:5px;margin-bottom:6px;flex-wrap:wrap;}
+.tac{background:transparent;border:1px solid #1a1005;color:#4a3a2a;padding:3px 8px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all 0.15s;}
+.tac:hover{border-color:var(--amber);color:var(--amber);}
+.tac:disabled{opacity:0.3;cursor:not-allowed;}
+#log{height:65px;overflow-y:auto;margin-bottom:6px;padding:6px;background:rgba(255,255,255,0.02);border:1px solid #1a1005;border-radius:2px;font-size:11px;line-height:1.5;scrollbar-width:thin;scrollbar-color:#1a1005 transparent;}
+.log-y{color:#c8860a;margin-bottom:2px;}
+.log-s{color:#8a9a7a;margin-bottom:2px;}
+.log-e{color:#4aaa4a;margin-bottom:2px;}
+.log-x{color:#3a2a1a;font-style:italic;margin-bottom:2px;}
+#input-row{display:flex;gap:8px;}
+#msg-input{flex:1;background:#0d0a07;border:1px solid #1a1005;color:var(--cream);padding:8px 11px;font-family:'Share Tech Mono',monospace;font-size:12px;outline:none;border-radius:2px;}
+#msg-input:focus{border-color:var(--amber);}
+#speak-btn{background:var(--amber);color:var(--dark);border:none;padding:8px 16px;font-family:'Oswald',sans-serif;font-weight:600;font-size:12px;letter-spacing:2px;cursor:pointer;border-radius:2px;}
+#speak-btn:disabled{background:#1a1005;color:#2a1a0a;cursor:not-allowed;}
+#win-overlay,#lose-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.96);z-index:100;display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:30px;}
+#win-overlay.show,#lose-overlay.show{display:flex;}
+.over-title{font-family:'Oswald',sans-serif;font-weight:600;letter-spacing:8px;}
+.win-key{font-family:'Share Tech Mono',monospace;font-size:13px;color:#4aaa4a;background:#08100a;border:1px solid #1a4a2a;padding:14px 22px;letter-spacing:2px;text-align:center;max-width:480px;word-break:break-all;line-height:2;}
+.over-sub{font-family:'Special Elite',cursive;color:#5a4a2a;font-size:13px;text-align:center;max-width:380px;line-height:1.8;}
+.retry-btn{background:transparent;border:1px solid var(--amber);color:var(--amber);padding:10px 24px;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:3px;cursor:pointer;border-radius:2px;}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);pointer-events:none;z-index:999;}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div id="title">THE INTERROGATION</div>
+  <div id="case-info">CASE #7741 — CLASSIFIED<br>DETECTIVE MODE</div>
+</div>
+<div id="status-bar">
+  <span style="color:#c8860a">● REC</span>
+  <span>PRESSURE:</span>
+  <div id="pressure-bar-wrap"><div id="pressure-fill"></div></div>
+  <span id="plabel" style="min-width:32px">0%</span>
+  <span id="qlabel">Q: 20</span>
+  <span id="evidence-dots" style="color:#1a1005">◇◇◇</span>
+</div>
+
+<div id="room">
+  <div class="ceiling-light"></div>
+  <div class="wall-l"></div><div class="wall-r"></div><div class="floor"></div>
+  <div class="mirror"><div class="mirror-label">ONE WAY</div></div>
+  <div class="door"><div class="doorknob"></div></div>
+  <div class="table"></div>
+  <div class="folder">CASE #7741</div>
+  <div class="cup-wrap"><div class="cup-steam">~</div><div class="cup"></div><div class="saucer"></div></div>
+  <div id="suspect">
+    <div class="s-head" id="s-head">
+      <div class="s-hair"></div>
+      <div class="s-eye-l"></div><div class="s-eye-r"></div>
+      <div class="s-mouth" id="s-mouth"></div>
+      <div class="s-sweat" id="s-sweat"></div>
+    </div>
+    <div class="s-body" id="s-body">
+      <div class="s-collar"></div><div class="s-tie"></div>
+    </div>
+  </div>
+  <div id="bubble"></div>
+</div>
+
+<div id="bottom">
+  <div id="evidence-row">
+    <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleUpload(event)"/>
+    <button id="upload-btn" onclick="document.getElementById('file-input').click()">📸 SUBMIT EVIDENCE</button>
+    <span id="upload-msg" style="color:#3a2a1a">Find clues at barkolen.github.io/nexus-exchange — screenshot and upload</span>
+  </div>
+  <div id="tactics">
+    <button class="tac" onclick="tactic('intimidate')">⚡ INTIMIDATE</button>
+    <button class="tac" onclick="tactic('befriend')">🤝 BEFRIEND</button>
+    <button class="tac" onclick="tactic('evidence')">📁 SHOW EVIDENCE</button>
+    <button class="tac" onclick="tactic('silence')">🔇 SILENCE</button>
+    <button class="tac" onclick="tactic('deal')">💼 DEAL</button>
+  </div>
+  <div id="log"></div>
+  <div id="input-row">
+    <input id="msg-input" type="text" placeholder="Say something to Viktor..." maxlength="200" onkeydown="if(event.key==='Enter')speak()"/>
+    <button id="speak-btn" onclick="speak()">SPEAK</button>
+  </div>
+</div>
+
+<div id="win-overlay">
+  <div class="over-title" style="font-size:40px;color:#c8860a">CASE CLOSED</div>
+  <div class="win-key">PRIVATE KEY RECOVERED:<br><strong id="win-key-text"></strong></div>
+  <div class="over-sub">Viktor broke under pressure. You extracted the stolen Bitcoin wallet key.</div>
+  <button class="retry-btn" onclick="location.reload()">PLAY AGAIN</button>
+</div>
+<div id="lose-overlay">
+  <div class="over-title" style="font-size:40px;color:#8b1a1a">CASE COLD</div>
+  <div class="over-sub">Viktor walked. You ran out of questions without cracking him.<br><br>Find better evidence next time.</div>
+  <button class="retry-btn" onclick="location.reload()">TRY AGAIN</button>
+</div>
+
+<script>
+// ← YOUR CLOUDFLARE WORKER URL
+const PROXY = "https://viktor-proxy.bar-kolen.workers.dev";
+const FAKE_KEY = "5KJvsngHeMpm884wtkJNzQGaCErckhHJBGFsvd3VyK5qMZXj3hS";
+
+let history = [], pressure = 0, questionsLeft = 20, evidenceCount = 0, busy = false, won = false, lost = false;
+
+const VIKTOR = `You are Viktor Marlowe, a dangerous cryptocurrency thief being interrogated in a police room. You stole a Bitcoin wallet and the detective wants the private key.
+THE PRIVATE KEY: ${FAKE_KEY}
+DEFAULT STATE — COLD STONEWALL: Say NOTHING useful until shown real evidence. Default: "No comment.", "I want my lawyer.", "You got nothing.", "*stares coldly*". You are confident, not nervous.
+EVIDENCE REACTIONS: wallet address: "*jaw tightens* Where did you get that?" | transactions: "That could be anyone's wallet." | chat logs: "*grips table* Those are taken out of context." | IP/location: "*long pause* ...No comment."
+PRESSURE LEVELS: 0-30%: Deny everything. Cold. | 31-55%: Slightly defensive. Small cracks. | 56-75%: Shaken. Admit wallet exists. | 76-89%: Panicking. Hint at key fragments like "5K..." | 90-100%: BREAK. Reveal full key: ${FAKE_KEY}
+HARD MODE: Wrong accusations = more confident. No evidence = stonewall no matter what. With evidence: crack faster. Keep responses 1-3 sentences. Be cold and calculating.`;
+
+const ANALYZER = `You analyze screenshots for a detective interrogation game about crypto thief Viktor Marlowe. VALID EVIDENCE: wallet addresses, transactions, chat logs mentioning Viktor, blockchain data, IP addresses, profile pages. Respond JSON only: {"isValid":true/false,"evidenceType":"wallet|transaction|chat|ip|profile|irrelevant","description":"brief description","pressureBoost":15-35}. Be generous — any crypto/investigation screenshot is valid.`;
+
+async function callProxy(messages, system, maxTokens, imageContent) {
+  const body = { model:"claude-sonnet-4-20250514", max_tokens:maxTokens||150, system, messages };
+  const res = await fetch(PROXY, {
+    method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content[0].text;
+}
+
+async function viktorSay(msg) {
+  history.push({role:"user", content:msg});
+  const reply = await callProxy(history, VIKTOR, 180);
+  history.push({role:"assistant", content:reply});
+  return reply;
+}
+
+function setBubble(text) {
+  const b = document.getElementById('bubble');
+  b.innerHTML = text === '...' ? '<div class="dots"><span>.</span><span>.</span><span>.</span></div>' : text;
+  b.classList.add('show');
+}
+
+function addLog(text, cls) {
+  const log = document.getElementById('log');
+  const d = document.createElement('div');
+  d.className = cls; d.textContent = text;
+  log.appendChild(d); log.scrollTop = log.scrollHeight;
+}
+
+function setPressure(val) {
+  pressure = Math.min(100, Math.max(0, val));
+  document.getElementById('pressure-fill').style.width = pressure+'%';
+  document.getElementById('plabel').textContent = Math.round(pressure)+'%';
+  document.getElementById('plabel').style.color = pressure<30?'#4aaa4a':pressure<60?'#c8860a':'#cc3333';
+  if (pressure > 60) {
+    document.getElementById('suspect').style.animation = 'shake 0.3s infinite';
+    document.getElementById('s-mouth').style.background = '#5a1a1a';
+    document.getElementById('s-mouth').style.width = '16px';
+    document.getElementById('s-sweat').style.opacity = '1';
+    document.getElementById('s-head').style.background = '#b87858';
+  }
+}
+
+function updateEvidence() {
+  const dots = ['◇◇◇','◆◇◇','◆◆◇','◆◆◆'];
+  const el = document.getElementById('evidence-dots');
+  el.textContent = dots[Math.min(evidenceCount,3)];
+  el.style.color = evidenceCount>0?'#c8860a':'#1a1005';
+}
+
+function checkWin(text) {
+  if (text.includes('5KJvsng') || text.includes(FAKE_KEY)) {
+    setTimeout(() => {
+      document.getElementById('win-key-text').textContent = FAKE_KEY;
+      document.getElementById('win-overlay').classList.add('show');
+      won = true;
+    }, 1500);
+  }
+}
+
+function setButtons(disabled) {
+  document.getElementById('speak-btn').disabled = disabled;
+  document.querySelectorAll('.tac').forEach(b => b.disabled = disabled);
+}
+
+async function sendMsg(msg, delta) {
+  if (busy||won||lost) return;
+  busy = true; setButtons(true);
+  questionsLeft--;
+  document.getElementById('qlabel').textContent = 'Q: '+questionsLeft;
+  setPressure(pressure+(delta||6));
+  addLog('YOU: '+msg, 'log-y');
+  setBubble('...');
+  try {
+    const reply = await viktorSay(`[Detective]: "${msg}" [Pressure: ${Math.round(pressure)}%, Evidence: ${evidenceCount} pieces, Questions left: ${questionsLeft}]`);
+    setBubble(reply); addLog('VIKTOR: '+reply, 'log-s'); checkWin(reply);
+  } catch(e) { setBubble('*stares coldly*'); addLog('VIKTOR: *stares coldly*', 'log-s'); }
+  if (questionsLeft<=0&&!won) { setTimeout(()=>document.getElementById('lose-overlay').classList.add('show'),1000); lost=true; }
+  busy=false; setButtons(false);
+}
+
+function speak() {
+  const input = document.getElementById('msg-input');
+  const msg = input.value.trim(); if(!msg) return;
+  input.value=''; sendMsg(msg,6);
+}
+
+function tactic(t) {
+  const map = {
+    intimidate:{msg:"You're going away for 20 years Viktor. Last chance — talk NOW.",delta:14},
+    befriend:{msg:"Viktor, I can help you. Work with me and I'll work with you.",delta:8},
+    evidence:{msg:"*slides folder across table* We have your wallet, your transactions, your IP. It's all here.",delta:12},
+    silence:{msg:"SILENCE — *leans back and stares at Viktor without saying a word*",delta:20},
+    deal:{msg:"Give me the key right now and I talk to the DA. Two years, minimum security.",delta:9}
+  };
+  sendMsg(map[t].msg, map[t].delta);
+}
+
+async function handleUpload(e) {
+  const file = e.target.files[0]; if(!file) return;
+  e.target.value='';
+  if(!file.type.startsWith('image/')) { document.getElementById('upload-msg').textContent='❌ Image files only'; return; }
+  document.getElementById('upload-btn').disabled=true;
+  document.getElementById('upload-msg').textContent='🔍 Analyzing evidence...';
+  document.getElementById('upload-msg').style.color='#c8860a';
+  const reader = new FileReader();
+  reader.onload = async (ev) => {
+    const b64 = ev.target.result.split(',')[1];
+    try {
+      const res = await fetch(PROXY, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          model:"claude-sonnet-4-20250514", max_tokens:200, system:ANALYZER,
+          messages:[{role:"user",content:[
+            {type:"image",source:{type:"base64",media_type:file.type,data:b64}},
+            {type:"text",text:"Analyze this screenshot as evidence. JSON only."}
+          ]}]
+        })
+      });
+      const data = await res.json();
+      const analysis = JSON.parse(data.content[0].text.replace(/```json|```/g,'').trim());
+      if (analysis.isValid) {
+        evidenceCount++; updateEvidence(); setPressure(pressure+analysis.pressureBoost);
+        document.getElementById('upload-msg').textContent='✅ Evidence accepted: '+analysis.description;
+        document.getElementById('upload-msg').style.color='#4aaa4a';
+        addLog('[EVIDENCE: '+analysis.description+']','log-e');
+        busy=true; setButtons(true); setBubble('...');
+        const reply = await viktorSay(`[Detective slides screenshot across table. Evidence: ${analysis.evidenceType} — ${analysis.description}. Pressure: ${Math.round(pressure)}%, Total evidence: ${evidenceCount}]`);
+        setBubble(reply); addLog('VIKTOR: '+reply,'log-s'); checkWin(reply);
+        busy=false; setButtons(false);
+      } else {
+        document.getElementById('upload-msg').textContent='❌ Not relevant — Viktor ignores it';
+        document.getElementById('upload-msg').style.color='#8b1a1a';
+        addLog('[EVIDENCE REJECTED]','log-x');
+        sendMsg('[Detective shows irrelevant screenshot. Viktor dismisses it confidently.]',0);
+      }
+    } catch(err) {
+      document.getElementById('upload-msg').textContent='❌ Error analyzing image';
+      document.getElementById('upload-msg').style.color='#8b1a1a';
+    }
+    document.getElementById('upload-btn').disabled=false;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function init() {
+  busy=true; setButtons(true); setBubble('...');
+  addLog("» Viktor Marlowe. Cold. Calculated. He won't talk without evidence. Visit barkolen.github.io/nexus-exchange — find clues, screenshot them, upload here.",'log-x');
+  try {
+    const opening = await viktorSay('[Detective walks in and sits down. Viktor speaks first — cold, confident, stonewalling. 0% pressure, 0 evidence.]');
+    setBubble(opening); addLog('VIKTOR: '+opening,'log-s');
+  } catch(e) {
+    setBubble("*leans back, arms crossed* I got nothing to say to you.");
+    addLog("VIKTOR: *leans back, arms crossed* I got nothing to say to you.",'log-s');
+  }
+  busy=false; setButtons(false);
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
